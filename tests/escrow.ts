@@ -34,9 +34,24 @@ describe("escrow", () => {
 
   before(async() => {
     console.log("Airdropping SOL to maker & taker...");
+    const latestBlockHash = await provider.connection.getLatestBlockhash();
 
-    await provider.connection.requestAirdrop(maker.publicKey, 100*anchor.web3.LAMPORTS_PER_SOL);
-    await provider.connection.requestAirdrop(taker.publicKey, 100*anchor.web3.LAMPORTS_PER_SOL);
+
+    const sig1 = await provider.connection.requestAirdrop(maker.publicKey, 100*anchor.web3.LAMPORTS_PER_SOL);
+    const sig2 = await provider.connection.requestAirdrop(taker.publicKey, 100*anchor.web3.LAMPORTS_PER_SOL);
+    
+    await Promise.all([
+      provider.connection.confirmTransaction({
+        signature: sig1,
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+      }),
+      provider.connection.confirmTransaction({
+        signature: sig2,
+        blockhash: latestBlockHash.blockhash,
+        lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+      }),
+    ]);
     console.log("Airdropped SOL to maker.");
     const makerBalance = await provider.connection.getBalance(maker.publicKey);
     console.log("Maker balance:", makerBalance);
