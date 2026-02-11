@@ -114,7 +114,22 @@ describe("escrow", () => {
   });
 
 
+  it("Refund escrow", async () => {
+    const tx = await program.methods.refund().accountsStrict({
+      maker: maker.publicKey,
+      escrow: escrowPda,
+      vault: vaultPda,
+      mintA: mintA,
+      mintB: mintB,
+      makerAta: makerAta,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    }).rpc();
+    console.log("Escrow refunded:", tx);
+  });
+
+
 
 
 });
-

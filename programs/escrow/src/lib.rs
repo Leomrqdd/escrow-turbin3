@@ -18,7 +18,8 @@ pub mod escrow {
         ctx.accounts.deposit(deposit)?;
         Ok(())
     }
-}
 
-#[derive(Accounts)]
-pub struct Initialize {}
+    pub fn refund(ctx:Context<Refund>) -> Result <()> {
+        ctx.accounts.refund_and_close_escrow_and_vault()
+    }
+}
