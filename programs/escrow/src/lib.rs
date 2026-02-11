@@ -22,4 +22,8 @@ pub mod escrow {
     pub fn refund(ctx:Context<Refund>) -> Result <()> {
         ctx.accounts.refund_and_close_escrow_and_vault()
     }
+
+    pub fn take(ctx:Context<Take>) -> Result <()> {
+        ctx.accounts.take_and_close_escrow_and_vault()
+    }
 }
