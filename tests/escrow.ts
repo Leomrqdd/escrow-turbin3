@@ -52,14 +52,6 @@ describe("escrow take and then make", () => {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       }),
     ]);
-    console.log("Airdropped SOL to maker.");
-    const makerBalance = await provider.connection.getBalance(maker.publicKey);
-    console.log("Maker balance:", makerBalance);
-    console.log("Maker public key:", maker.publicKey.toBase58());
-    const takerBalance = await provider.connection.getBalance(taker.publicKey);
-    console.log("Taker balance:", takerBalance);
-    console.log("Taker public key:", taker.publicKey.toBase58());
-    console.log("--------------------------------");
 
     console.log("Creating mints...");
     mintA = await createMint(provider.connection,maker,maker.publicKey,null,0)
@@ -118,18 +110,6 @@ describe("escrow take and then make", () => {
   
     vaultPda = getAssociatedTokenAddressSync(mintA, escrowPda,true);
 
-    console.log("Escrow PDA:", escrowPda.toBase58());
-    console.log("Vault PDA:", vaultPda.toBase58());
-    console.log("Maker ATA A:", makerAtaA.toBase58());
-    console.log("Maker ATA B:", makerAtaB.toBase58());
-    console.log("Taker ATA A:", takerAtaA.toBase58());
-    console.log("Taker ATA B:", takerAtaB.toBase58());
-    console.log("Mint A:", mintA.toBase58());
-    console.log("Mint B:", mintB.toBase58());
-    console.log("associated token program:", ASSOCIATED_TOKEN_PROGRAM_ID.toBase58());
-    console.log("token program:", TOKEN_PROGRAM_ID.toBase58());
-    console.log("system program:", anchor.web3.SystemProgram.programId.toBase58());
-
     const tx = await program.methods.make(seed,new anchor.BN(depositAmount),new anchor.BN(receiveAmount)).accountsStrict({
       maker: maker.publicKey,
       escrow: escrowPda,
@@ -143,23 +123,6 @@ describe("escrow take and then make", () => {
     }).rpc();
     console.log("Escrow initialized:", tx);
   });
-
-
-  // it("Refund escrow", async () => {
-  //   const tx = await program.methods.refund().accountsStrict({
-  //     maker: maker.publicKey,
-  //     escrow: escrowPda,
-  //     vault: vaultPda,
-  //     mintA: mintA,
-  //     mintB: mintB,
-  //     makerAta: makerAtaA,
-  //     associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-  //     tokenProgram: TOKEN_PROGRAM_ID,
-  //     systemProgram: anchor.web3.SystemProgram.programId,
-  //   }).rpc();
-  //   console.log("Escrow refunded:", tx);
-  // });
-
 
   it("take escrow", async () => {
     const tx = await program.methods.take().accountsStrict({
@@ -250,14 +213,6 @@ describe("escrow make and then refund", () => {
         lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
       }),
     ]);
-    console.log("Airdropped SOL to maker.");
-    const makerBalance = await provider.connection.getBalance(maker.publicKey);
-    console.log("Maker balance:", makerBalance);
-    console.log("Maker public key:", maker.publicKey.toBase58());
-    const takerBalance = await provider.connection.getBalance(taker.publicKey);
-    console.log("Taker balance:", takerBalance);
-    console.log("Taker public key:", taker.publicKey.toBase58());
-    console.log("--------------------------------");
 
     console.log("Creating mints...");
     mintA = await createMint(provider.connection,maker,maker.publicKey,null,0)
@@ -315,18 +270,6 @@ describe("escrow make and then refund", () => {
     );
   
     vaultPda = getAssociatedTokenAddressSync(mintA, escrowPda,true);
-
-    console.log("Escrow PDA:", escrowPda.toBase58());
-    console.log("Vault PDA:", vaultPda.toBase58());
-    console.log("Maker ATA A:", makerAtaA.toBase58());
-    console.log("Maker ATA B:", makerAtaB.toBase58());
-    console.log("Taker ATA A:", takerAtaA.toBase58());
-    console.log("Taker ATA B:", takerAtaB.toBase58());
-    console.log("Mint A:", mintA.toBase58());
-    console.log("Mint B:", mintB.toBase58());
-    console.log("associated token program:", ASSOCIATED_TOKEN_PROGRAM_ID.toBase58());
-    console.log("token program:", TOKEN_PROGRAM_ID.toBase58());
-    console.log("system program:", anchor.web3.SystemProgram.programId.toBase58());
 
     const tx = await program.methods.make(seed,new anchor.BN(depositAmount),new anchor.BN(receiveAmount)).accountsStrict({
       maker: maker.publicKey,
