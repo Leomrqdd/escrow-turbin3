@@ -1,3 +1,4 @@
+import { assert } from "chai";
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { Escrow } from "../target/types/escrow";
@@ -93,6 +94,12 @@ describe("escrow take and then make", () => {
     console.log("Taker token balance B:", takerTokenBalanceB.value.amount)
 
 
+    assert.equal(makerTokenBalanceA.value.amount,String(depositAmount));
+    assert.equal(makerTokenBalanceB.value.amount, "0");
+    assert.equal(takerTokenBalanceA.value.amount, "0");
+    assert.equal(takerTokenBalanceB.value.amount, String(receiveAmount));
+
+
 
 
 
@@ -122,7 +129,16 @@ describe("escrow take and then make", () => {
       systemProgram : anchor.web3.SystemProgram.programId,
     }).rpc();
     console.log("Escrow initialized:", tx);
+
+    const makerTokenBalanceA = await provider.connection.getTokenAccountBalance(makerAtaA);
+    const makerTokenBalanceB = await provider.connection.getTokenAccountBalance(makerAtaB);
+    const vaultTokenBalanceA = await provider.connection.getTokenAccountBalance(vaultPda);
+    assert.equal(makerTokenBalanceA.value.amount,"0");
+    assert.equal(makerTokenBalanceB.value.amount, "0");
+    assert.equal(vaultTokenBalanceA.value.amount, String(depositAmount));
   });
+
+
 
   it("take escrow", async () => {
     const tx = await program.methods.take().accountsStrict({
@@ -151,7 +167,15 @@ describe("escrow take and then make", () => {
     console.log("Taker token balance A:", takerTokenBalanceA.value.amount)
     console.log("Taker token balance B:", takerTokenBalanceB.value.amount)
 
+    assert.equal(makerTokenBalanceA.value.amount,"0");
+    assert.equal(makerTokenBalanceB.value.amount, String(receiveAmount));
+    assert.equal(takerTokenBalanceA.value.amount, String(depositAmount));
+    assert.equal(takerTokenBalanceB.value.amount, "0");
 
+    const escrowAccountInfo = await provider.connection.getAccountInfo(escrowPda);
+    const vaultAccountInfo = await provider.connection.getAccountInfo(vaultPda);
+    assert.isNull(escrowAccountInfo, "escrow account should be closed after take");
+    assert.isNull(vaultAccountInfo, "vault account should be closed after take");
   });
 
 
@@ -253,6 +277,11 @@ describe("escrow make and then refund", () => {
     console.log("Taker token balance A:", takerTokenBalanceA.value.amount)
     console.log("Taker token balance B:", takerTokenBalanceB.value.amount)
 
+    assert.equal(makerTokenBalanceA.value.amount,String(depositAmount));
+    assert.equal(makerTokenBalanceB.value.amount, "0");
+    assert.equal(takerTokenBalanceA.value.amount, "0");
+    assert.equal(takerTokenBalanceB.value.amount, String(receiveAmount));
+
 
 
 
@@ -283,7 +312,17 @@ describe("escrow make and then refund", () => {
       systemProgram : anchor.web3.SystemProgram.programId,
     }).rpc();
     console.log("Escrow initialized:", tx);
+
+    const makerTokenBalanceA = await provider.connection.getTokenAccountBalance(makerAtaA);
+    const makerTokenBalanceB = await provider.connection.getTokenAccountBalance(makerAtaB);
+    const vaultTokenBalanceA = await provider.connection.getTokenAccountBalance(vaultPda);
+    assert.equal(makerTokenBalanceA.value.amount,"0");
+    assert.equal(makerTokenBalanceB.value.amount, "0");
+    assert.equal(vaultTokenBalanceA.value.amount, String(depositAmount));
+
   });
+
+
 
 
   it("Refund escrow", async () => {
@@ -299,6 +338,14 @@ describe("escrow make and then refund", () => {
       systemProgram: anchor.web3.SystemProgram.programId,
     }).rpc();
     console.log("Escrow refunded:", tx);
+
+    const escrowAccountInfo = await provider.connection.getAccountInfo(escrowPda);
+    const vaultAccountInfo = await provider.connection.getAccountInfo(vaultPda);
+    assert.isNull(escrowAccountInfo, "escrow account should be closed after refund");
+    assert.isNull(vaultAccountInfo, "vault account should be closed after refund");
+
+    const makerTokenBalanceA = await provider.connection.getTokenAccountBalance(makerAtaA);
+    assert.equal(makerTokenBalanceA.value.amount, String(depositAmount));
   });
 
 
