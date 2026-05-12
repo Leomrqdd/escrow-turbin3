@@ -323,8 +323,6 @@ describe("escrow make and then refund", () => {
   });
 
 
-
-
   it("Refund escrow", async () => {
     const tx = await program.methods.refund().accountsStrict({
       maker: maker.publicKey,
@@ -347,6 +345,32 @@ describe("escrow make and then refund", () => {
     const makerTokenBalanceA = await provider.connection.getTokenAccountBalance(makerAtaA);
     assert.equal(makerTokenBalanceA.value.amount, String(depositAmount));
   });
+
+
+it ("should not allow taker to take after refund", async () => {
+  try {
+    await program.methods.take().accountsStrict({
+      taker: taker.publicKey,
+      maker: maker.publicKey,
+      escrow: escrowPda,
+      vault: vaultPda,
+      mintA: mintA,
+      mintB: mintB,
+      makerAtaB: makerAtaB,
+      takerAtaB: takerAtaB,
+      takerAtaA: takerAtaA,
+      associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    }).signers([taker]).rpc();
+    assert.fail("Taker should not be able to take after refund");
+  }
+  catch (err) {
+    console.log("Expected error:", err.message);
+    assert.include(err.message, "AnchorError", "Error should be account not found since escrow and vault accounts are closed");
+  }
+});
+
 
 
 });
